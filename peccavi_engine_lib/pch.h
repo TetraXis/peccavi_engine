@@ -8,6 +8,8 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "peccavi_engine.h"
+#include "peccavi_engine_utilities.h"
+#include "peccavi_engine_components.h"
+//#include "peccavi_engine.h"
 
 #endif //PCH_H
