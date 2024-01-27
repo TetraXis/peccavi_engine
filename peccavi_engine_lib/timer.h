@@ -19,7 +19,7 @@ public:
         m_bRunning = false;
     }
 
-    double elapsed_milliseconds()
+    double elapsed_milliseconds() const
     {
         std::chrono::time_point<std::chrono::system_clock> endTime;
 
@@ -35,12 +35,12 @@ public:
         return double(std::chrono::duration_cast<std::chrono::milliseconds>(endTime - m_StartTime).count());
     }
 
-    double elapsed_seconds()
+    double elapsed_seconds() const
     {
         return elapsed_milliseconds() / 1000.0;
     }
 
-    bool is_running()
+    bool is_running() const
     {
         return m_bRunning;
     }
