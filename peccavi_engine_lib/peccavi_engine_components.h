@@ -1,5 +1,7 @@
 #pragma once
 
+#include "peccavi_engine_interfaces.h"
+
 namespace pe
 {
 	struct object;
@@ -12,9 +14,9 @@ namespace pe
 		/// </summary>
 		struct component
 		{
-			object* owner = nullptr;	// Owner of this component, advised not to change it manualy
+			i_owner<component>* owner = nullptr;	// Owner of this component, advised not to change it manualy
 
-			virtual void tick(double delta_time) {}
+			virtual void tick(double delta_time) { delta_time; }
 		};
 
 		struct life_time : component
@@ -27,6 +29,11 @@ namespace pe
 			void tick(double delta_time) override
 			{
 				time -= delta_time;
+
+				if (time <= 0)
+				{
+					owner->~i_owner<component>();
+				}
 			}
 		};
 	}

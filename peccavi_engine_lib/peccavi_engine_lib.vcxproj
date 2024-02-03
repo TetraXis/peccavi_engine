@@ -147,6 +147,8 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="peccavi_engine_collision.h" />
     <ClInclude Include="peccavi_engine_components.h" />
+    <ClInclude Include="peccavi_engine_core.h" />
+    <ClInclude Include="peccavi_engine_interfaces.h" />
     <ClInclude Include="peccavi_engine_literals.h" />
     <ClInclude Include="peccavi_engine_utilities.h" />
     <ClInclude Include="timer.h" />
@@ -161,6 +163,8 @@
     <ClCompile Include="peccavi_engine.cpp" />
     <ClCompile Include="peccavi_engine_collision.cpp" />
     <ClCompile Include="peccavi_engine_components.cpp" />
+    <ClCompile Include="peccavi_engine_core.cpp" />
+    <ClCompile Include="peccavi_engine_interfaces.cpp" />
     <ClCompile Include="peccavi_engine_literals.cpp" />
     <ClCompile Include="peccavi_engine_utilities.cpp" />
   </ItemGroup>

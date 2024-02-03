@@ -36,6 +36,12 @@
     <ClInclude Include="peccavi_engine_literals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="peccavi_engine_core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="peccavi_engine_interfaces.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="peccavi_engine.cpp">
@@ -54,6 +60,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="peccavi_engine_literals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="peccavi_engine_core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="peccavi_engine_interfaces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
