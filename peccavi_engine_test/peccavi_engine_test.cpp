@@ -18,7 +18,7 @@ struct my_object : pe::object
 
 struct slave
 {
-
+	void* owner = nullptr;
 };
 
 struct master : i_owner<slave>
@@ -30,7 +30,7 @@ struct master : i_owner<slave>
 
 	void set_owner(slave* owned_ptr)
 	{
-
+		owned_ptr->owner = this;
 	}
 };
 
