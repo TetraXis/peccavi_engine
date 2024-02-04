@@ -16,12 +16,27 @@ struct my_object : pe::object
 	}
 };
 
+using namespace pe;
+
+struct slave : is_owned<slave>
+{
+
+};
+
+struct master : owner_of<slave>
+{
+	vector<slave*> slaves;
+
+	master() : owner_of<slave>(&slaves) {}
+};
+
+
 int main()
 {
-	pe::engine eng;
-	pe::object obj;
+	master M;
+	slave S;
 
-	eng.add(new pe::object());
+	M.add(&S);
 
 	//eng.add(new pe::phys_object());
 
