@@ -42,7 +42,7 @@ namespace pe
 		void add(is_owned<ty>* owned_ptr)
 		{
 			owned_objs_ptr->push_back((ty*)owned_ptr);
-			owned_ptr.owner = this;
+			owned_ptr->owner = this;
 		}
 
 		void remove(is_owned<ty>* owned_ptr)

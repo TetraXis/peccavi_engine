@@ -21,6 +21,8 @@ int main()
 	pe::engine eng;
 	pe::object obj;
 
+	eng.add(new pe::object());
+
 	//eng.add(new pe::phys_object());
 
 	//eng.add<pe::object>(new pe::object());

@@ -27,7 +27,7 @@ namespace pe
 	/// </summary>
 	/// TODO: Play with alignas(...)
 	///   V
-	struct object : owner_of<component>
+	struct object : owner_of<component>, is_owned<object>
 	{
 		// When adding members here, dont forget to update constructors
 		owner_of<object>* owner = nullptr;
@@ -77,7 +77,6 @@ namespace pe
 
 		using owner_of<object>::add;
 		using owner_of<object>::remove;
-		
 
 		using owner_of<phys_object>::add;
 		using owner_of<phys_object>::remove;
