@@ -16,12 +16,27 @@ struct my_object : pe::object
 	}
 };
 
+struct slave
+{
+
+};
+
+struct master : i_owner<slave>
+{
+	vector<slave*> vec;
+
+	master() : i_owner<slave>(&vec)
+	{}
+
+	void set_owner(slave* owned_ptr)
+	{
+
+	}
+};
+
 int main()
 {
-	pe::engine eng;
-	pe::object obj;
 
-	eng.add(new pe::phys_object());
 
 	//eng.add<pe::object>(new pe::object());
 }
