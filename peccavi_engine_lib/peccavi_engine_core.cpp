@@ -5,7 +5,7 @@ namespace pe
 {
 
 	engine::engine()
-		: i_owner<object>(&objects), i_owner<phys_object>(&phys_objects)
+		: owner_of<object>(&objects), owner_of<phys_object>(&phys_objects)
 	{
 	}
 
@@ -53,22 +53,12 @@ namespace pe
 		return clock.is_running();
 	}
 
-	void engine::set_owner(object* owned_ptr)
-	{
-		owned_ptr->owner = this;
-	}
-
-	void engine::set_owner(phys_object* owned_ptr)
-	{
-		owned_ptr->owner = this;
-	}
-
-	object::object() : i_owner(&components)
+	object::object() : owner_of(&components)
 	{
 	}
 
 	object::object(const object& other)
-		: i_owner(&components), name(other.name), components(other.components)
+		: owner_of(&components), name(other.name), components(other.components)
 	{
 		for (component* comp : components)
 		{
@@ -76,22 +66,9 @@ namespace pe
 		}
 	}
 
-	void object::set_owner(component* owned_ptr)
-	{
-		owned_ptr->owner = this;
-	}
-
-	object::~object()
-	{
-		if (owner)
-		{
-			owner->remove(this);
-		}
-	}
-
 	// TODO: add zeroing, move-constructor must delete other
 	/*object::object(const object&& other) noexcept
-		: i_owner(&components), name(other.name), components(other.components)
+		: owner_of(&components), name(other.name), components(other.components)
 	{
 		for (component* comp : components)
 		{
