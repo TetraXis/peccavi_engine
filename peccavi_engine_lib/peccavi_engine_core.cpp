@@ -5,7 +5,6 @@ namespace pe
 {
 
 	engine::engine()
-		: owner_of<object>(&objects), owner_of<phys_object>(&phys_objects)
 	{
 	}
 
@@ -53,12 +52,11 @@ namespace pe
 		return clock.is_running();
 	}
 
-	object::object() : owner_of(&components)
+	object::object()
 	{
 	}
 
 	object::object(const object& other)
-		: owner_of(&components), name(other.name), components(other.components)
 	{
 		for (component* comp : components)
 		{

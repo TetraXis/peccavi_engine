@@ -12,8 +12,9 @@ namespace pe
 		/// <summary>
 		/// A simple component, which is called every tick. For example `life_time_component` or `projectile_movement_component`.
 		/// </summary>
-		struct component : is_owned<component>
+		struct component
 		{
+			object* owner = nullptr;
 			//owner_of<component>* owner = nullptr;	// Owner of this component, advised not to change it manualy
 
 			virtual void tick(double delta_time) { delta_time; }
@@ -33,7 +34,7 @@ namespace pe
 				if (time <= 0)
 				{
 					//owner->~owner_of<component>();
-					owner->~owner_of();
+					//owner->~owner_of();
 				}
 			}
 		};
