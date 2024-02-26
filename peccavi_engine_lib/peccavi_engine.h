@@ -14,8 +14,11 @@
 // Use this define if you want stable tps, 
 // engine will slow down if it cant reach desired tps. 
 // If not defined engine will skip ticks.
+// #define PE_FORCE_STABLE_TPS
 
-//#define PE_FORCE_STABLE_TPS
+// Use this define if you want ALL members of ALL classes to be public.
+// WARNING. Newly-public members should be handled carefully, they HAVE SIDE EFFECTS.
+// #define PE_ALL_MEMBERS_PUBLIC
 
 namespace pe
 {

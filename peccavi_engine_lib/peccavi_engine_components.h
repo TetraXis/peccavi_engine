@@ -14,7 +14,8 @@ namespace pe
 		/// </summary>
 		struct component
 		{
-			i_owner<component>* owner = nullptr;	// Owner of this component, advised not to change it manualy
+			object* owner = nullptr;
+			//owner_of<component>* owner = nullptr;	// Owner of this component, advised not to change it manualy
 
 			virtual void tick(double delta_time) { delta_time; }
 		};
@@ -32,7 +33,8 @@ namespace pe
 
 				if (time <= 0)
 				{
-					owner->~i_owner<component>();
+					//owner->~owner_of<component>();
+					//owner->~owner_of();
 				}
 			}
 		};

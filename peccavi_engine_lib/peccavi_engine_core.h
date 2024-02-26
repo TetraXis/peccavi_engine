@@ -27,11 +27,11 @@ namespace pe
 	/// </summary>
 	/// TODO: Play with alignas(...)
 	///   V
-	struct object : i_owner<component>
+	struct object
 	{
-		// When adding members here, dont forget to update constructors
-		i_owner<object>* owner = nullptr;
-		std::string name = "object";				// Name, can be depricated
+		// When adding members here, don't forget to update constructors
+		object* owner = nullptr;
+		std::string name = "object";				// Name, can be deprecated
 		std::vector<component*> components = {};
 
 		object();
@@ -39,10 +39,6 @@ namespace pe
 		object(const object&& other) noexcept = delete;	// move constructor
 
 		virtual void tick(double delta_time) { delta_time; }
-
-		void set_owner(component* owned_ptr) override;
-
-		~object();
 	};
 
 	/// <summary>
@@ -62,7 +58,7 @@ namespace pe
 	/// <summary>
 	/// Engine that owns everything. Ticks every object inside and does all calculations.
 	/// </summary>
-	struct engine : i_owner<object>, i_owner<phys_object>
+	struct engine
 	{
 		// Prefer using methods instead of directly changing variables
 		double tick_time = 0.01;						// Desired time between ticks, s
@@ -78,17 +74,6 @@ namespace pe
 		virtual void stop();
 		virtual void loop();
 		virtual bool is_running() const;
-
-		using i_owner<object>::add;
-		using i_owner<object>::remove;
-		using i_owner<object>::set_owner;
-		void set_owner(object* owned_ptr) override;
-		
-
-		using i_owner<phys_object>::add;
-		using i_owner<phys_object>::remove;
-		using i_owner<phys_object>::set_owner;
-		void set_owner(phys_object* owned_ptr) override;
 	};
 
 }
