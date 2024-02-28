@@ -50,6 +50,7 @@ namespace pe
 
 	public:
 		object();
+		virtual ~object();
 		//object(const object& other);			// copy constructor
 		object(const object&& other) noexcept = delete;	// move constructor
 
@@ -68,9 +69,10 @@ namespace pe
 		/// <summary>
 		/// Sets an owning engine for this object. Moves ownership of 'this' to the engine.
 		/// Don't call it from a "std::vector" or any other smart container. Use "engine::add_object()" instead.
+		/// Call it if you want to add this object as just "object". Consider using "phys_object::set_owner_as_phys()".
 		/// </summary>
 		/// <param name="engine_ptr"> - Pointer to engine</param>
-		virtual void set_owner(engine* const engine_ptr);
+		void set_owner(engine* const engine_ptr);
 
 		/// <summary>
 		/// Attaches given component to this object. 
@@ -120,9 +122,10 @@ namespace pe
 		/// <summary>
 		/// Sets an owning engine for this phys_object. Moves ownership of 'this' to the engine.
 		/// Don't call it from a "std::vector" or any other smart container. Use "engine::add_object()" instead.
+		/// Call it if you want to add this object as "just "phys_object".
 		/// </summary>
 		/// <param name="engine_ptr"> - Pointer to engine</param>
-		virtual void set_owner(engine* const engine_ptr) override;
+		void set_owner_as_phys(engine* const engine_ptr);
 	};
 
 	/// <summary>
@@ -146,6 +149,7 @@ namespace pe
 
 	public:
 		engine();
+		virtual ~engine();
 
 		/// <summary>
 		/// Starts the engine.

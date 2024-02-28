@@ -8,6 +8,18 @@ namespace pe
 	{
 	}
 
+	engine::~engine()
+	{
+		for (unsigned long long i = 0; i < objects.size(); i++)
+		{
+			delete objects[i];
+		}
+		for (unsigned long long i = 0; i < phys_objects.size(); i++)
+		{
+			delete phys_objects[i];
+		}
+	}
+
 	void engine::start()
 	{
 		clock.start();
@@ -106,6 +118,14 @@ namespace pe
 	{
 	}
 
+	object::~object()
+	{
+		for (unsigned long long i = 0; i < components.size(); i++)
+		{
+			delete components[i];
+		}
+	}
+
 	engine* object::get_owner() const
 	{
 		return owner;
@@ -171,7 +191,7 @@ namespace pe
 		name = "phys_object";
 	}
 
-	void phys_object::set_owner(engine* const engine_ptr)
+	void phys_object::set_owner_as_phys(engine* const engine_ptr)
 	{
 		if (owner)
 		{
