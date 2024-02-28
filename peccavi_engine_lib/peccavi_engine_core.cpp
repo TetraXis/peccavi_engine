@@ -23,6 +23,7 @@ namespace pe
 	void engine::start()
 	{
 		clock.start();
+		loop();
 	}
 
 	void engine::stop()
@@ -55,6 +56,7 @@ namespace pe
 						comp->tick(PE_DELTA_TIME);
 					}
 				}
+				clock.set_start();	// Restarting a new tick start time;
 			}
 		}
 	}
@@ -112,6 +114,16 @@ namespace pe
 	{
 		detach_object(object_ptr);
 		delete object_ptr;
+	}
+
+	const std::vector<object*>& engine::get_objects() const
+	{
+		return objects;
+	}
+
+	const std::vector<phys_object*>& engine::get_phys_objects() const
+	{
+		return phys_objects;
 	}
 
 	object::object()

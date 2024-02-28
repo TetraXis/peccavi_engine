@@ -196,6 +196,17 @@ namespace pe
 		/// <param name="object_ptr"> - Pointer to an object</param>
 		void destroy_object(object* const object_ptr);
 
+		/// <summary>
+		/// Gets all simple objects from this engine.
+		/// </summary>
+		/// <returns>Array of owned simple objects</returns>
+		const std::vector<object*>& get_objects() const;
+
+		/// <summary>
+		/// Gets all physics objects from this engine.
+		/// </summary>
+		/// <returns>Array of owned physics objects</returns>
+		const std::vector<phys_object*>& get_phys_objects() const;
 	};
 
 }

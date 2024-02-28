@@ -13,6 +13,11 @@ public:
         m_bRunning = true;
     }
 
+    void set_start()
+    {
+        m_StartTime = std::chrono::system_clock::now();
+    }
+
     void stop()
     {
         m_EndTime = std::chrono::system_clock::now();
