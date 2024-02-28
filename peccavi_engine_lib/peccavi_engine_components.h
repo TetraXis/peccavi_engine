@@ -46,7 +46,7 @@ namespace pe
 
 				if (time <= 0)
 				{
-					//get_owner()->get_owning_engine()
+					//get_owner()->get_owner()
 				}
 			}
 		};

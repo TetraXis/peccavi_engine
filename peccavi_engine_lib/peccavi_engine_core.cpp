@@ -55,15 +55,15 @@ namespace pe
 	void engine::add_object(object** object_ptr)
 	{
 		objects.push_back(*object_ptr);
-		(*object_ptr)->owning_engine = this;
+		(*object_ptr)->owner = this;
 		(*object_ptr) = nullptr;
 	}
 
-	void engine::add_phys_object(phys_object** object_ptr)
+	void engine::add_phys_object(phys_object** phys_object_ptr)
 	{
-		phys_objects.push_back(*object_ptr);
-		(*object_ptr)->owning_engine = this;
-		(*object_ptr) = nullptr;
+		phys_objects.push_back(*phys_object_ptr);
+		(*phys_object_ptr)->owner = this;
+		(*phys_object_ptr) = nullptr;
 	}
 
 	void engine::destroy_object(object* const object_ptr)
@@ -103,9 +103,19 @@ namespace pe
 		return owner;
 	}*/
 
-	engine* object::get_owning_engine() const
+	engine* object::get_owner() const
 	{
-		return owning_engine;
+		return owner;
+	}
+
+	void object::set_owner(engine* const engine_ptr)
+	{
+		if (owner)
+		{
+			owner->destroy_object(this);
+		}
+		engine_ptr->objects.push_back(this);
+		owner = engine_ptr;
 	}
 
 	void object::add_component(component** component_ptr)
@@ -138,6 +148,16 @@ namespace pe
 	phys_object::phys_object()
 	{
 		name = "phys_object";
+	}
+
+	void phys_object::set_owner(engine* const engine_ptr)
+	{
+		if (owner)
+		{
+			owner->destroy_object(this);
+		}
+		engine_ptr->phys_objects.push_back(this);
+		owner = engine_ptr;
 	}
 
 }
