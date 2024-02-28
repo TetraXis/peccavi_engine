@@ -23,32 +23,39 @@ namespace pe
 			friend struct object;
 
 		critical:
-			object* owner = nullptr;
-			//owner_of<component>* owner = nullptr;	// Owner of this component, advised not to change it manualy
+			object* owner = nullptr;	// Owning object
+
 
 		public:
+			/// <summary>
+			/// Executes every tick by an owning engine of an owning object.
+			/// </summary>
+			/// <param name="delta_time"> - Time that passed since last tick</param>
 			virtual void tick(double delta_time) { delta_time; }
 
+			/// <summary>
+			/// Gets an owning object for this component.
+			/// </summary>
+			/// <returns>Owning object</returns>
 			object* get_owner() const;
-			void attach_to(object* const owner_object);
+
+			/// <summary>
+			/// Sets an owning object for this component. Moves ownership of 'this' to the object.
+			/// Don't call it from a "std::vector" or any other smart container. Use "object::add_component()" instead.
+			/// </summary>
+			/// <param name="object_ptr"> - Pointer to object</param>
+			void set_owner(object* const object_ptr);
 		};
 
 		struct life_time : component
 		{
+		public:
 			double time = 1;	// Time that object has to live, s
 
-			life_time(double new_time = 1) : time(new_time)
-			{}
+		public:
+			life_time(double new_time = 1);
 
-			void tick(double delta_time) override
-			{
-				time -= delta_time;
-
-				if (time <= 0)
-				{
-					//get_owner()->get_owner()
-				}
-			}
+			void tick(double delta_time) override;
 		};
 	}
 }

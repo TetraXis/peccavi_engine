@@ -54,6 +54,10 @@ namespace pe
 
 	void engine::add_object(object** object_ptr)
 	{
+		if ((*object_ptr)->owner)
+		{
+			(*object_ptr)->owner->detach_object((*object_ptr));
+		}
 		objects.push_back(*object_ptr);
 		(*object_ptr)->owner = this;
 		(*object_ptr) = nullptr;
@@ -61,18 +65,23 @@ namespace pe
 
 	void engine::add_phys_object(phys_object** phys_object_ptr)
 	{
+		if ((*phys_object_ptr)->owner)
+		{
+			(*phys_object_ptr)->owner->detach_object((*phys_object_ptr));
+		}
 		phys_objects.push_back(*phys_object_ptr);
 		(*phys_object_ptr)->owner = this;
 		(*phys_object_ptr) = nullptr;
 	}
 
-	void engine::destroy_object(object* const object_ptr)
+	void engine::detach_object(object* const object_ptr)
 	{
 		for (unsigned long long i = 0; i < objects.size(); i++)
 		{
 			if (objects[i] == object_ptr)
 			{
 				objects.erase(objects.begin() + i);
+				object_ptr->owner = nullptr;
 				return;
 			}
 		}
@@ -81,27 +90,21 @@ namespace pe
 			if (phys_objects[i] == object_ptr)
 			{
 				phys_objects.erase(phys_objects.begin() + i);
+				object_ptr->owner = nullptr;
 				return;
 			}
 		}
 	}
 
+	void engine::destroy_object(object* const object_ptr)
+	{
+		detach_object(object_ptr);
+		delete object_ptr;
+	}
+
 	object::object()
 	{
 	}
-
-	/*object::object(const object& other)
-	{
-		for (component* comp : components)
-		{
-			comp->owner = this;
-		}
-	}*/
-
-	/*object* object::get_owner() const
-	{
-		return owner;
-	}*/
 
 	engine* object::get_owner() const
 	{
@@ -112,7 +115,7 @@ namespace pe
 	{
 		if (owner)
 		{
-			owner->destroy_object(this);
+			owner->detach_object(this);
 		}
 		engine_ptr->objects.push_back(this);
 		owner = engine_ptr;
@@ -120,13 +123,31 @@ namespace pe
 
 	void object::add_component(component** component_ptr)
 	{
-		(*component_ptr)->attach_to(this);
+		if ((*component_ptr)->owner)
+		{
+			(*component_ptr)->owner->detach_component(*component_ptr);
+		}
+		components.push_back(*component_ptr);
+		(*component_ptr)->owner = this;
 		*component_ptr = nullptr;
 	}
 
-	void object::remove_component(component* const component_ptr)
+	void object::detach_component(component* const component_ptr)
 	{
-		component_ptr->attach_to(nullptr);
+		for (unsigned long long i = 0; i < components.size(); i++)
+		{
+			if (components[i] == component_ptr)
+			{
+				components.erase(components.begin() + i);
+				component_ptr->owner = nullptr;
+				return;
+			}
+		}
+	}
+
+	void object::destroy_component(component* const component_ptr)
+	{
+		detach_component(component_ptr);
 		delete component_ptr;
 	}
 
@@ -154,7 +175,7 @@ namespace pe
 	{
 		if (owner)
 		{
-			owner->destroy_object(this);
+			owner->detach_object(this);
 		}
 		engine_ptr->phys_objects.push_back(this);
 		owner = engine_ptr;

@@ -66,7 +66,8 @@ namespace pe
 		engine* get_owner() const;
 
 		/// <summary>
-		/// Sets an owning engine for this object.
+		/// Sets an owning engine for this object. Moves ownership of 'this' to the engine.
+		/// Don't call it from a "std::vector" or any other smart container. Use "engine::add_object()" instead.
 		/// </summary>
 		/// <param name="engine_ptr"> - Pointer to engine</param>
 		virtual void set_owner(engine* const engine_ptr);
@@ -80,10 +81,17 @@ namespace pe
 
 		/// <summary>
 		/// Detaches given component from this object. 
-		/// DOES free pointer.
+		/// Does NOT free memory from a pointer.
 		/// </summary>
 		/// <param name="component_ptr">Ptr to component</param>
-		void remove_component(component* const component_ptr);
+		void detach_component(component* const component_ptr);
+
+		/// <summary>
+		/// Destroys given component from this object. 
+		/// DOES free memory from a pointer.
+		/// </summary>
+		/// <param name="component_ptr">Ptr to component</param>
+		void destroy_component(component* const component_ptr);
 		
 		/// <summary>
 		/// Gets all attached components to this object.
@@ -110,7 +118,8 @@ namespace pe
 		phys_object();
 
 		/// <summary>
-		/// Sets an owning engine for this phys_object.
+		/// Sets an owning engine for this phys_object. Moves ownership of 'this' to the engine.
+		/// Don't call it from a "std::vector" or any other smart container. Use "engine::add_object()" instead.
 		/// </summary>
 		/// <param name="engine_ptr"> - Pointer to engine</param>
 		virtual void set_owner(engine* const engine_ptr) override;
@@ -159,14 +168,12 @@ namespace pe
 		/// <returns>TRUE if engine is running, FALSE otherwise</returns>
 		bool is_running() const;
 
-
 		/// <summary>
 		/// Adds given object to this engine. You might meant to use "add_phys_object()."
 		/// Takes ownership of given pointer and erases it.
 		/// </summary>
 		/// <param name="object_ptr"> - Pointer to an object</param>
 		void add_object(object** object_ptr);
-
 
 		/// <summary>
 		/// Adds given phys_object to this engine. 
@@ -176,11 +183,19 @@ namespace pe
 		void add_phys_object(phys_object** phys_object_ptr);
 
 		/// <summary>
+		/// Detaches a given object.
+		/// Does NOT free memory from a pointer.
+		/// </summary>
+		/// <param name="object_ptr"> - Pointer to an object</param>
+		void detach_object(object* const object_ptr);
+
+		/// <summary>
 		/// Destroys a given object.
-		/// DOES free memory.
+		/// DOES free memory from a pointer.
 		/// </summary>
 		/// <param name="object_ptr"> - Pointer to an object</param>
 		void destroy_object(object* const object_ptr);
+
 	};
 
 }

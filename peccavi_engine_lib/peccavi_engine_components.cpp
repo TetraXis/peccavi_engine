@@ -13,20 +13,28 @@ namespace pe
 			return owner;
 		}
 
-		void component::attach_to(object* const owner_object)
+		void component::set_owner(object* const object_ptr)
 		{
 			if (owner)
 			{
-				for (unsigned long long i = 0; i < owner->components.size(); i++)
-				{
-					if (owner->components[i] == this)
-					{
-						owner->components.erase(owner->components.begin() + i);
-					}
-				}
+				owner->detach_component(this);
 			}
-			owner_object->components.push_back(this);
-			owner = owner_object;
+			object_ptr->components.push_back(this);
+			owner = object_ptr;
+		}
+
+		life_time::life_time(double new_time) : time(new_time)
+		{
+		}
+
+		void life_time::tick(double delta_time)
+		{
+			time -= delta_time;
+
+			if (time <= 0)
+			{
+				get_owner()->get_owner()->destroy_object(get_owner());
+			}
 		}
 
 	}
