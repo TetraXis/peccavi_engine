@@ -28,7 +28,7 @@ namespace pe
 				{
 					obj->tick(PE_DELTA_TIME);
 
-					for (component* comp : obj->components)
+					for (component* comp : obj->get_components())
 					{
 						comp->tick(PE_DELTA_TIME);
 					}
@@ -38,7 +38,7 @@ namespace pe
 				{
 					ph_obj->tick(PE_DELTA_TIME);
 
-					for (component* comp : ph_obj->components)
+					for (component* comp : ph_obj->get_components())
 					{
 						comp->tick(PE_DELTA_TIME);
 					}
@@ -52,16 +52,77 @@ namespace pe
 		return clock.is_running();
 	}
 
+	void engine::add_object(object** object_ptr)
+	{
+		objects.push_back(*object_ptr);
+		(*object_ptr)->owning_engine = this;
+		(*object_ptr) = nullptr;
+	}
+
+	void engine::add_phys_object(phys_object** object_ptr)
+	{
+		phys_objects.push_back(*object_ptr);
+		(*object_ptr)->owning_engine = this;
+		(*object_ptr) = nullptr;
+	}
+
+	void engine::destroy_object(object* const object_ptr)
+	{
+		for (unsigned long long i = 0; i < objects.size(); i++)
+		{
+			if (objects[i] == object_ptr)
+			{
+				objects.erase(objects.begin() + i);
+				return;
+			}
+		}
+		for (unsigned long long i = 0; i < phys_objects.size(); i++)
+		{
+			if (phys_objects[i] == object_ptr)
+			{
+				phys_objects.erase(phys_objects.begin() + i);
+				return;
+			}
+		}
+	}
+
 	object::object()
 	{
 	}
 
-	object::object(const object& other)
+	/*object::object(const object& other)
 	{
 		for (component* comp : components)
 		{
 			comp->owner = this;
 		}
+	}*/
+
+	/*object* object::get_owner() const
+	{
+		return owner;
+	}*/
+
+	engine* object::get_owning_engine() const
+	{
+		return owning_engine;
+	}
+
+	void object::add_component(component** component_ptr)
+	{
+		(*component_ptr)->attach_to(this);
+		*component_ptr = nullptr;
+	}
+
+	void object::remove_component(component* const component_ptr)
+	{
+		component_ptr->attach_to(nullptr);
+		delete component_ptr;
+	}
+
+	const std::vector<component*>& object::get_components() const
+	{
+		return components;
 	}
 
 	// TODO: add zeroing, move-constructor must delete other

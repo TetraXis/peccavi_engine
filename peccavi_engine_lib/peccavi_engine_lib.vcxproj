@@ -168,6 +168,9 @@
     <ClCompile Include="peccavi_engine_literals.cpp" />
     <ClCompile Include="peccavi_engine_utilities.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Issues.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

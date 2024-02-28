@@ -16,29 +16,59 @@
 #define PE_DELTA_TIME clock.elapsed_seconds()
 #endif
 
+#ifdef PE_ALL_MEMBERS_PUBLIC
+#define critical public
+#else
+#define critical private
+#endif
+
 namespace pe
 {
 	using namespace components;
 
 	typedef vector3_d vec;
 
+	struct engine;
+
 	/// <summary>
 	/// Describes an object, that can have added components.
 	/// </summary>
 	/// TODO: Play with alignas(...)
 	///   V
-	struct object
+	struct object 
 	{
-		// When adding members here, don't forget to update constructors
-		object* owner = nullptr;
+		friend struct component;
+		friend struct engine;
+
+	public:
 		std::string name = "object";				// Name, can be deprecated
+
+	critical:
+		// When adding members here, don't forget to update constructors
+		//object* owner = nullptr;
+		engine* owning_engine = nullptr;
 		std::vector<component*> components = {};
 
+
+	public:
 		object();
-		object(const object& other);			// copy constructor
+		//object(const object& other);			// copy constructor
 		object(const object&& other) noexcept = delete;	// move constructor
 
 		virtual void tick(double delta_time) { delta_time; }
+
+		//object* get_owner() const;
+		engine* get_owning_engine() const;
+
+		void add_component(component** component_ptr);
+
+		/// <summary>
+		/// Detaches given component from this object. DOES free pointer.
+		/// </summary>
+		/// <param name="component_ptr">Ptr to component</param>
+		void remove_component(component* const component_ptr);
+		
+		const std::vector<component*>& get_components() const;
 	};
 
 	/// <summary>
@@ -60,20 +90,27 @@ namespace pe
 	/// </summary>
 	struct engine
 	{
-		// Prefer using methods instead of directly changing variables
+	public:
 		double tick_time = 0.01;						// Desired time between ticks, s
+		vec gravity = { 0.0,0.0,-9.8 };
+
+	critical:
 		timer clock;									// Clock
 		std::vector<object*> objects = {};				// Simplest object. No physics for these
 		std::vector<phys_object*> phys_objects = {};	// Physic objects. Full physics for these
 
-		vec gravity = { 0.0,0.0,-9.8 };
 
+	public:
 		engine();
 
-		virtual void start();
-		virtual void stop();
-		virtual void loop();
-		virtual bool is_running() const;
+		void start();
+		void stop();
+		void loop();
+		bool is_running() const;
+
+		void add_object(object** object_ptr);
+		void add_phys_object(phys_object** object_ptr);
+		void destroy_object(object* const object_ptr);
 	};
 
 }

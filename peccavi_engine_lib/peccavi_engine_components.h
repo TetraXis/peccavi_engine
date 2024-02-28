@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef PE_ALL_MEMBERS_PUBLIC
+#define critical public
+#else
+#define critical private
+#endif
+
 #include "peccavi_engine_interfaces.h"
 
 namespace pe
@@ -14,10 +20,17 @@ namespace pe
 		/// </summary>
 		struct component
 		{
+			friend struct object;
+
+		critical:
 			object* owner = nullptr;
 			//owner_of<component>* owner = nullptr;	// Owner of this component, advised not to change it manualy
 
+		public:
 			virtual void tick(double delta_time) { delta_time; }
+
+			object* get_owner() const;
+			void attach_to(object* const owner_object);
 		};
 
 		struct life_time : component
@@ -33,8 +46,7 @@ namespace pe
 
 				if (time <= 0)
 				{
-					//owner->~owner_of<component>();
-					//owner->~owner_of();
+					//get_owner()->get_owning_engine()
 				}
 			}
 		};
