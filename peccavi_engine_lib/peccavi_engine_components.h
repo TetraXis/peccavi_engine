@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 #ifdef PE_ALL_MEMBERS_PUBLIC
 #define critical public
@@ -22,17 +23,14 @@ namespace pe
 		{
 			friend struct object;
 
+		public:
+			std::function<void(double)> tick = [this](double delta_time) {delta_time;}; // Called every tick
+
 		critical:
 			object* owner = nullptr;	// Owning object
 
 
 		public:
-			/// <summary>
-			/// Executes every tick by an owning engine of an owning object.
-			/// </summary>
-			/// <param name="delta_time"> - Time that passed since last tick</param>
-			virtual void tick(double delta_time) { delta_time; }
-
 			/// <summary>
 			/// Gets an owning object for this component.
 			/// </summary>
@@ -54,8 +52,6 @@ namespace pe
 
 		public:
 			life_time(double new_time = 1);
-
-			void tick(double delta_time) override;
 		};
 	}
 }

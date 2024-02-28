@@ -25,17 +25,15 @@ namespace pe
 
 		life_time::life_time(double new_time) : time(new_time)
 		{
+			tick = [this](double delta_time)
+				{
+					time -= delta_time;
+
+					if (time <= 0)
+					{
+						get_owner()->get_owner()->destroy_object(get_owner());
+					}
+				};
 		}
-
-		void life_time::tick(double delta_time)
-		{
-			time -= delta_time;
-
-			if (time <= 0)
-			{
-				get_owner()->get_owner()->destroy_object(get_owner());
-			}
-		}
-
 	}
 }

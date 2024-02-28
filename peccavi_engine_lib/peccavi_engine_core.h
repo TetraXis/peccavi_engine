@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "peccavi_engine_utilities.h"
 #include "peccavi_engine_literals.h"
@@ -41,7 +42,8 @@ namespace pe
 		friend struct component;
 
 	public:
-		std::string name = "object";	// Name, can be deprecated
+		std::string name = "object";												// Name, can be deprecated
+		std::function<void(double)> tick = [this](double delta_time) {delta_time;};	// Called every tick by owning engine
 
 	critical:
 		engine* owner = nullptr;					// Owning engine
@@ -53,12 +55,6 @@ namespace pe
 		virtual ~object();
 		//object(const object& other);			// copy constructor
 		object(const object&& other) noexcept = delete;	// move constructor
-
-		/// <summary>
-		/// Executes every tick by an owning engine.
-		/// </summary>
-		/// <param name="delta_time"> - Time that passed since last tick</param>
-		virtual void tick(double delta_time) { delta_time; }
 
 		/// <summary>
 		/// Gets an owning engine for this object.
