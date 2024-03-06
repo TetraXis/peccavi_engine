@@ -50,4 +50,20 @@ namespace pe
 		void operator += (const vector3_d& other);
 		void operator -= (const vector3_d& other);
 	};
+
+	/// <summary>
+	/// Distance between two points. Consider using 'distance_squared'.
+	/// </summary>
+	/// <param name="a"> - Point in space</param>
+	/// <param name="b"> - Point in space</param>
+	/// <returns>Distance between  two given points</returns>
+	double distance(const vector3_d a, const vector3_d b);
+
+	/// <summary>
+	/// Squared distance between two points.
+	/// </summary>
+	/// <param name="a"> - Point in space</param>
+	/// <param name="b"> - Point in space</param>
+	/// <returns>Squared distance between  two given points</returns>
+	double distance_squared(const vector3_d a, const vector3_d b);
 }

@@ -131,3 +131,13 @@ void pe::vector3_d::operator-=(const vector3_d& other)
 	y -= other.y;
 	z -= other.z;
 }
+
+double pe::distance(const vector3_d a, const vector3_d b)
+{
+	return sqrt((a.x - b.x) + (a.y - b.y) + (a.z - b.z));
+}
+
+double pe::distance_squared(const vector3_d a, const vector3_d b)
+{
+	return (a.x - b.x) + (a.y - b.y) + (a.z - b.z);
+}

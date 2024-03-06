@@ -33,6 +33,7 @@ namespace pe
 				// You can set tick function here
 				tick = [this](double delta_time)
 					{
+						delta_time;	// So compiler wouldn't cry
 						data = -1;
 					};
 			}
@@ -49,6 +50,7 @@ namespace pe
 		//           vvv
 		obj->tick = [obj](double delta_time)
 			{
+				delta_time;	// So compiler wouldn't cry
 				obj->data = 10;
 				obj->get_owner()->stop();	// Make engine stop after this tick
 			};

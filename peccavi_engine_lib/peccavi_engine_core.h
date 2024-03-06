@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <map>
 
 #include "peccavi_engine_utilities.h"
 #include "peccavi_engine_literals.h"
@@ -65,7 +66,7 @@ namespace pe
 		/// <summary>
 		/// Sets an owning engine for this object. Moves ownership of 'this' to the engine.
 		/// Don't call it from a "std::vector" or any other smart container. Use "engine::add_object()" instead.
-		/// Call it if you want to add this object as just "object". Consider using "phys_object::set_owner_as_phys()".
+		/// Call it if you want to add this object as just "object".
 		/// </summary>
 		/// <param name="engine_ptr"> - Pointer to engine</param>
 		void set_owner(engine* const engine_ptr);
@@ -99,6 +100,16 @@ namespace pe
 	};
 
 	/// <summary>
+	/// Movement type of a phys_object.
+	/// </summary>
+	enum struct movement_type
+	{
+		fixed,		// Object cannot be moved
+		movable,	// Object moving freely
+		forcing		// Object moving freely, and its movement cannot be obstructed by other objects
+	};
+
+	/// <summary>
 	/// A physical object with mass, position, rotation and collisions.
 	/// Base class : "object"
 	/// </summary>
@@ -107,21 +118,34 @@ namespace pe
 		friend struct object;
 		friend struct component;
 
-		double mass = 1;						// Mass, Kg
+	public:
+		double mass = 1.0;						// Mass, Kg
 		vec position = { 0.0,0.0,0.0 };			// Position in 3D space, m
 		//vec rotation = { 0.0,0.0,0.0 };
 		vec velocity = { 0.0,0.0,0.0 };			// Velocity, m/s
 		//std::vector<component*> collisions = {};	// All collision components
 
+	critical:
+		unsigned long long layer = 0;
+		movement_type mov_type = movement_type::movable;
+
+	public:
 		phys_object();
 
-		/// <summary>
-		/// Sets an owning engine for this phys_object. Moves ownership of 'this' to the engine.
-		/// Don't call it from a "std::vector" or any other smart container. Use "engine::add_object()" instead.
-		/// Call it if you want to add this object as "just "phys_object".
-		/// </summary>
-		/// <param name="engine_ptr"> - Pointer to engine</param>
-		void set_owner_as_phys(engine* const engine_ptr);
+		movement_type get_mov_type() const;
+
+		void set_mov_type(movement_type new_type);
+
+		unsigned long long get_layer() const;
+
+		void set_layer(unsigned long long new_layer);
+	};
+
+	struct collision_layer
+	{
+		std::vector<phys_object*> fixed_objects = {};
+		std::vector<phys_object*> moving_objects = {};
+		std::vector<phys_object*> forcing_objects = {};
 	};
 
 	/// <summary>
@@ -140,7 +164,8 @@ namespace pe
 	critical:
 		timer clock;									// Clock
 		std::vector<object*> objects = {};				// Simplest objects. No physics for these
-		std::vector<phys_object*> phys_objects = {};	// Physic objects. Full physics for these
+		//std::vector<phys_object*> phys_objects = {};	// Physic objects. Full physics for these
+		std::map<unsigned long long, collision_layer> layers = {};
 
 
 	public:
@@ -201,12 +226,6 @@ namespace pe
 		/// </summary>
 		/// <returns>Array of owned simple objects</returns>
 		const std::vector<object*>& get_objects() const;
-
-		/// <summary>
-		/// Gets all physics objects from this engine.
-		/// </summary>
-		/// <returns>Array of owned physics objects</returns>
-		const std::vector<phys_object*>& get_phys_objects() const;
 	};
 
 }
