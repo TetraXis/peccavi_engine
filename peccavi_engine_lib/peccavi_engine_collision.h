@@ -18,7 +18,6 @@ namespace pe
 	typedef vector3_d vec;
 
 	struct object;
-	struct phys_object;
 
 	/// <summary>
 	/// Contains all collision related classes.
@@ -105,11 +104,13 @@ namespace pe
 
 		struct collision_skeleton
 		{
+			friend struct object;
+
 		public:
 			bool active = true;
 
 		critical:
-			phys_object* owner = nullptr;
+			object* owner = nullptr;
 			vec bounding_sphere_origin = { 0.0,0.0,0.0 };	// Origin of a smallest sphere. Offset from owner's origin, m
 			double bounding_sphere_radius = 0;
 			std::vector<primitive*> primitives = {};
@@ -117,7 +118,7 @@ namespace pe
 		public:
 			collision_skeleton() {}
 
-			phys_object* get_owner() const;
+			object* get_owner() const;
 
 			void add_primitive(primitive** prim_ptr);
 

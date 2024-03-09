@@ -6,9 +6,9 @@ namespace pe
 
 	engine::engine()
 	{
-		physics_tick = [this](std::vector<phys_object*>& objects, double delta_time)
+		physics_tick = [this](std::vector<object*>& objects, double delta_time)
 			{
-				for (phys_object* obj : objects)
+				for (object* obj : objects)
 				{
 					if (obj->active)
 					{
@@ -30,7 +30,7 @@ namespace pe
 								objects[i]->collision->is_overlapping(objects[j]->collision)
 							)
 							{
-								collisions::collision_point col_point = objects[i]->collision->get_collision_point(objects[j]->collision);
+								collision_point col_point = objects[i]->collision->get_collision_point(objects[j]->collision);
 								if (!col_point.primitive_a)
 								{
 									continue;
@@ -54,13 +54,9 @@ namespace pe
 
 	engine::~engine()
 	{
-		for (unsigned long long i = 0; i < objects.size(); i++)
-		{
-			delete objects[i];
-		}
 		for (auto const& [key, layer] : layers)
 		{
-			for (phys_object* obj : layer)
+			for (object* obj : layer)
 			{
 				delete obj;
 			}
@@ -84,7 +80,7 @@ namespace pe
 		{
 			if (clock.elapsed_seconds() >= tick_time)
 			{
-				for (object* obj : objects)
+				/*for (object* obj : objects)
 				{
 					for (component* comp : obj->get_components())
 					{
@@ -92,7 +88,7 @@ namespace pe
 					}
 
 					obj->tick(PE_DELTA_TIME);
-				}
+				}*/
 
 				for (auto& [key, layer] : layers)
 				{
@@ -109,41 +105,20 @@ namespace pe
 		return clock.is_running();
 	}
 
-	void engine::add_object(object** object_ptr)
+	void engine::add_object(object** obj_ptr)
 	{
-		if ((*object_ptr)->owner)
+		if ((*obj_ptr)->owner)
 		{
-			(*object_ptr)->owner->detach_object((*object_ptr));
+			(*obj_ptr)->owner->detach_object((*obj_ptr));
 		}
-		objects.push_back(*object_ptr);
-		(*object_ptr)->owner = this;
-		(*object_ptr) = nullptr;
-	}
-
-	void engine::add_phys_object(phys_object** phys_obj_ptr)
-	{
-		if ((*phys_obj_ptr)->owner)
-		{
-			(*phys_obj_ptr)->owner->detach_object((*phys_obj_ptr));
-		}
-		layers[(*phys_obj_ptr)->get_layer()].push_back(*phys_obj_ptr);
-		(*phys_obj_ptr)->owner = this;
-		(*phys_obj_ptr) = nullptr;
+		layers[(*obj_ptr)->get_layer()].push_back(*obj_ptr);
+		(*obj_ptr)->owner = this;
+		(*obj_ptr) = nullptr;
 	}
 
 	void engine::detach_object(object* const object_ptr)
 	{
-		for (unsigned long long i = 0; i < objects.size(); i++)
-		{
-			if (objects[i] == object_ptr)
-			{
-				objects.erase(objects.begin() + i);
-				object_ptr->owner = nullptr;
-				return;
-			}
-		}
-
-		std::vector<phys_object*>* vec_ptr = &(layers[((phys_object*)(object_ptr))->get_layer()]);
+		std::vector<object*>* vec_ptr = &(layers[object_ptr->get_layer()]);
 
 		for (unsigned long long i = 0; i < vec_ptr->size(); i++)
 		{
@@ -162,12 +137,12 @@ namespace pe
 		delete object_ptr;
 	}
 
-	const std::vector<object*>& engine::get_objects() const
+	const std::vector<object*>& engine::get_objects(unsigned long long selected_layer) const
 	{
-		return objects;
+		return layers.at(selected_layer);
 	}
 
-	const std::map<unsigned long long, std::vector<phys_object*>>& engine::get_layers() const
+	const std::map<unsigned long long, std::vector<object*>>& engine::get_all_layers() const
 	{
 		return layers;
 	}
@@ -182,6 +157,7 @@ namespace pe
 		{
 			delete components[i];
 		}
+		delete collision;
 	}
 
 	engine* object::get_owner() const
@@ -189,15 +165,16 @@ namespace pe
 		return owner;
 	}
 
-	void object::set_owner(engine* const engine_ptr)
-	{
-		if (owner)
-		{
-			owner->detach_object(this);
-		}
-		engine_ptr->objects.push_back(this);
-		owner = engine_ptr;
-	}
+	//void object::set_owner(engine* const engine_ptr)
+	//{
+	//	if (owner)
+	//	{
+	//		owner->detach_object(this);
+	//	}
+	//	object* temp = this;
+	//	engine_ptr->add_object(&temp);
+	//	//owner = engine_ptr;
+	//}
 
 	void object::add_component(component** component_ptr)
 	{
@@ -244,24 +221,40 @@ namespace pe
 		}
 	}*/
 
-	phys_object::phys_object()
-	{
-		name = "phys_object";
-	}
-
-	unsigned long long phys_object::get_layer() const
+	unsigned long long object::get_layer() const
 	{
 		return layer;
 	}
 
-	void phys_object::set_layer(unsigned long long new_layer)
+	void object::set_layer(unsigned long long new_layer)
 	{
 		engine* owner_ptr = get_owner();
 		owner_ptr->detach_object(this);
 		layer = new_layer;
-		phys_object* temp = this;
-		owner_ptr->add_phys_object(&temp);
+		object* temp = this;
+		owner_ptr->add_object(&temp);
 	}
 
+	collision_skeleton* object::get_collision_skeleton() const
+	{
+		return collision;
+	}
+
+	void object::set_collision_skeleton(collision_skeleton** col_skel)
+	{
+		if ((*col_skel)->owner)
+		{
+			(*col_skel)->owner->detach_collision_skeleton();
+		}
+		collision = *col_skel;
+		(*col_skel)->owner = this;
+		(*col_skel) = nullptr;
+	}
+
+	void object::detach_collision_skeleton()
+	{
+		collision->owner = nullptr;
+		collision = nullptr;
+	}
 
 }

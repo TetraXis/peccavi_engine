@@ -27,28 +27,34 @@
 namespace pe
 {
 	using namespace components;
+	using namespace collisions;
 
 	typedef vector3_d vec;
 
 	struct engine;
-	struct phys_object;
 
 	/// <summary>
-	/// Describes an object. Can have added components. Base for "phys_object".
+	/// Describes an object in 3D space. It is possible to add components to it.
 	/// </summary>
 	struct object 
 	{
 		friend struct engine;
-		friend struct phys_object;
 		friend struct component;
 
 	public:
 		std::string name = "object";												// Name, can be deprecated
 		std::function<void(double)> tick = [this](double delta_time) {delta_time;};	// Called every tick by owning engine
+		bool active = true;						// Should physics apply or not
+		double mass = 1.0;						// Mass, Kg
+		vec position = { 0.0,0.0,0.0 };			// Position in 3D space, m
+		//vec rotation = { 0.0,0.0,0.0 };
+		vec velocity = { 0.0,0.0,0.0 };			// Velocity, m/s
 
 	critical:
 		engine* owner = nullptr;					// Owning engine
 		std::vector<component*> components = {};	// Attached components
+		collision_skeleton* collision = nullptr;
+		unsigned long long layer = 0;
 
 
 	public:
@@ -62,14 +68,6 @@ namespace pe
 		/// </summary>
 		/// <returns>Owning engine</returns>
 		engine* get_owner() const;
-
-		/// <summary>
-		/// Sets an owning engine for this object. Moves ownership of 'this' to the engine.
-		/// Don't call it from a "std::vector" or any other smart container. Use "engine::add_object()" instead.
-		/// Call it if you want to add this object as just "object".
-		/// </summary>
-		/// <param name="engine_ptr"> - Pointer to engine</param>
-		void set_owner(engine* const engine_ptr);
 
 		/// <summary>
 		/// Attaches given component to this object. 
@@ -97,35 +95,16 @@ namespace pe
 		/// </summary>
 		/// <returns>All attached components</returns>
 		const std::vector<component*>& get_components() const;
-	};
-
-	/// <summary>
-	/// A physical object with mass, position, rotation and collisions.
-	/// Base class : "object"
-	/// </summary>
-	struct phys_object : object
-	{
-		friend struct object;
-		friend struct component;
-
-	public:
-		bool active = false;					// Should physics apply or not
-		double mass = 1.0;						// Mass, Kg
-		vec position = { 0.0,0.0,0.0 };			// Position in 3D space, m
-		//vec rotation = { 0.0,0.0,0.0 };
-		vec velocity = { 0.0,0.0,0.0 };			// Velocity, m/s
-		//std::vector<component*> collisions = {};	// All collision components
-		collisions::collision_skeleton* collision = nullptr;
-
-	critical:
-		unsigned long long layer = 0;
-
-	public:
-		phys_object();
 
 		unsigned long long get_layer() const;
 
 		void set_layer(unsigned long long new_layer);
+
+		collision_skeleton* get_collision_skeleton() const;
+
+		void set_collision_skeleton(collision_skeleton** col_skel);
+
+		void detach_collision_skeleton();
 	};
 
 	/// <summary>
@@ -134,19 +113,16 @@ namespace pe
 	struct engine
 	{
 		friend struct object;
-		friend struct phys_object;
 		friend struct component;
 
 	public:
 		double tick_time = 0.01;						// Desired time between ticks, s
 		vec gravity = { 0.0,0.0,-9.8 };
-		std::function<void(std::vector<phys_object*>&, double)> physics_tick;
+		std::function<void(std::vector<object*>&, double)> physics_tick;
 
 	critical:
 		timer clock;									// Clock
-		std::vector<object*> objects = {};				// Simplest objects. No physics for these
-		//std::vector<phys_object*> phys_objects = {};	// Physic objects. Full physics for these
-		std::map<unsigned long long, std::vector<phys_object*>> layers = {};
+		std::map<unsigned long long, std::vector<object*>> layers = {};
 
 
 	public:
@@ -182,13 +158,6 @@ namespace pe
 		void add_object(object** object_ptr);
 
 		/// <summary>
-		/// Adds given phys_object to this engine. 
-		/// Takes ownership of given pointer and erases it.
-		/// </summary>
-		/// <param name="phys_object_ptr"> - Pointer to an object</param>
-		void add_phys_object(phys_object** phys_object_ptr);
-
-		/// <summary>
 		/// Detaches a given object.
 		/// Does NOT free memory from a pointer.
 		/// </summary>
@@ -206,9 +175,9 @@ namespace pe
 		/// Gets all simple objects from this engine.
 		/// </summary>
 		/// <returns>Array of owned simple objects</returns>
-		const std::vector<object*>& get_objects() const;
+		const std::vector<object*>& get_objects(unsigned long long selected_layer = 0) const;
 
-		const std::map<unsigned long long, std::vector<phys_object*>>& get_layers() const;
+		const std::map<unsigned long long, std::vector<object*>>& get_all_layers() const;
 	};
 
 }

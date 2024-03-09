@@ -105,7 +105,7 @@ namespace pe
 		{
 		}
 
-		phys_object* collision_skeleton::get_owner() const
+		object* collision_skeleton::get_owner() const
 		{
 			return owner;
 		}

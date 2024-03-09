@@ -41,9 +41,7 @@ namespace pe
 
 		engine* eng = new engine();
 		my_object* obj = new my_object();
-		phys_object* ball = new phys_object();
 		component* comp = new components::life_time(10);
-		component* comp_2 = new components::life_time(10);
 
 		// You can set tick function to class instances individually.
 		// If you change it that way, make sure to capture a pointer.
@@ -58,18 +56,10 @@ namespace pe
 		obj->add_component(&comp);	// Takes ownership
 		// Now comp = nullptr
 
-		ball->add_component(&comp_2);// Takes ownership
-		// Now comp_2 = nullptr
-
 		// Cast to (object**) is needed if you passing a derived class
 		//              vvvvvvvvvvvvvvvv
 		eng->add_object((object**)(&obj));	// Takes ownership
 		// Now obj = nullptr;
-		
-		// Cast to (phys_object**) is needed if you passing a derived class
-		//                   vvvvvvvvvvvvvvvvvvvvvv
-		eng->add_phys_object((phys_object**)(&ball));	// Takes ownership
-		// Now ball = nullptr;
 
 		eng->start();
 	}
