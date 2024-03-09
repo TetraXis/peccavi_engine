@@ -36,7 +36,7 @@ namespace pe
 			cuboid
 		};
 
-		struct collision;
+		struct collision_skeleton;
 		struct primitive;
 		struct sphere;
 		struct cuboid;
@@ -46,14 +46,14 @@ namespace pe
 		/// </summary>
 		struct primitive
 		{
-			friend struct collision;
+			friend struct collision_skeleton;
 
 		public:
 			const c_type type = c_type::none;
 			vec origin = { 0.0,0.0,0.0 };	// Shift from owner's origin, m
 
 		critical:
-			collision* owner = nullptr;
+			collision_skeleton* owner = nullptr;
 
 		public:
 			primitive(c_type new_type = c_type::none);
@@ -69,7 +69,7 @@ namespace pe
 			/// Gets absolute world location.
 			/// </summary>
 			/// <returns>Absolute world location</returns>
-			vec get_world_location() const;
+			vec get_world_position() const;
 
 		};
 
@@ -80,6 +80,15 @@ namespace pe
 
 		public:
 			sphere();
+		};
+
+		struct collision_point
+		{
+			vec position = { 0.0,0.0,0.0 };	// World position
+			vec normal = { 1.0,1.0,1.0 };	// Facing at primitive_a
+			double intersection_depth = 0.0;
+			primitive* primitive_a = nullptr;
+			primitive* primitive_b = nullptr;
 		};
 
 		/// <summary>
@@ -94,9 +103,10 @@ namespace pe
 			cuboid();
 		};
 
-		struct collision
+		struct collision_skeleton
 		{
 		public:
+			bool active = true;
 
 		critical:
 			phys_object* owner = nullptr;
@@ -105,7 +115,7 @@ namespace pe
 			std::vector<primitive*> primitives = {};
 
 		public:
-			collision() {}
+			collision_skeleton() {}
 
 			phys_object* get_owner() const;
 
@@ -115,7 +125,9 @@ namespace pe
 
 			void destroy_primitive(primitive* const prim_ptr);
 
-			bool is_overlapping(collision* col_ptr);
+			bool is_overlapping(collision_skeleton* col_ptr);
+
+			collision_point get_collision_point(collision_skeleton* col_ptr);
 		};
 
 		bool collision_spheres(sphere* const sphere_1, sphere* const sphere_2);

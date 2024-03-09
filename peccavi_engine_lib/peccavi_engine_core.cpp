@@ -6,6 +6,50 @@ namespace pe
 
 	engine::engine()
 	{
+		physics_tick = [this](std::vector<phys_object*>& objects, double delta_time)
+			{
+				for (phys_object* obj : objects)
+				{
+					if (obj->active)
+					{
+						obj->velocity += gravity * delta_time;
+						obj->position += obj->velocity * delta_time;
+					}
+				}
+
+				for (unsigned long long i = 0; i < objects.size(); i++)
+				{
+					if (objects[i]->active && objects[i]->collision && objects[i]->collision->active)
+					{
+						for (unsigned long long j = 0; j < i; j++)
+						{
+							if
+							(
+								objects[j]->collision &&
+								objects[j]->collision->active &&
+								objects[i]->collision->is_overlapping(objects[j]->collision)
+							)
+							{
+								collisions::collision_point col_point = objects[i]->collision->get_collision_point(objects[j]->collision);
+								if (!col_point.primitive_a)
+								{
+									continue;
+								}
+								if (objects[j]->active)
+								{
+									objects[i]->position += col_point.normal * col_point.intersection_depth / 2;
+									objects[j]->position += -col_point.normal * col_point.intersection_depth / 2;
+								}
+								else
+								{
+									objects[i]->position += col_point.normal * col_point.intersection_depth;
+									// TODO: here
+								}
+							}
+						}
+					}
+				}
+			};
 	}
 
 	engine::~engine()
@@ -16,15 +60,7 @@ namespace pe
 		}
 		for (auto const& [key, layer] : layers)
 		{
-			for (phys_object* obj : layer.fixed_objects)
-			{
-				delete obj;
-			}
-			for (phys_object* obj : layer.moving_objects)
-			{
-				delete obj;
-			}
-			for (phys_object* obj : layer.forcing_objects)
+			for (phys_object* obj : layer)
 			{
 				delete obj;
 			}
@@ -58,20 +94,10 @@ namespace pe
 					obj->tick(PE_DELTA_TIME);
 				}
 
-				//for (phys_object* ph_obj : phys_objects)
-				//{
-				//	for (component* comp : ph_obj->get_components())
-				//	{
-				//		comp->tick(PE_DELTA_TIME);
-				//	}
-
-				//	ph_obj->tick(PE_DELTA_TIME);
-				//}
-
-				//for (phys_object* ph_obj : phys_objects)
-				//{
-				//	// TODO: here
-				//}
+				for (auto& [key, layer] : layers)
+				{
+					physics_tick(layer, PE_DELTA_TIME);
+				}
 
 				clock.set_start();	// Restarting a new tick start time;
 			}
@@ -100,21 +126,7 @@ namespace pe
 		{
 			(*phys_obj_ptr)->owner->detach_object((*phys_obj_ptr));
 		}
-		switch ((*phys_obj_ptr)->get_mov_type())
-		{
-		case movement_type::fixed:
-			layers[(*phys_obj_ptr)->get_layer()].fixed_objects.push_back(*phys_obj_ptr);
-			break;
-		case movement_type::movable:
-			layers[(*phys_obj_ptr)->get_layer()].moving_objects.push_back(*phys_obj_ptr);
-			break;
-		case movement_type::forcing:
-			layers[(*phys_obj_ptr)->get_layer()].forcing_objects.push_back(*phys_obj_ptr);
-			break;
-		default:
-			return;
-			break;
-		}
+		layers[(*phys_obj_ptr)->get_layer()].push_back(*phys_obj_ptr);
 		(*phys_obj_ptr)->owner = this;
 		(*phys_obj_ptr) = nullptr;
 	}
@@ -131,28 +143,11 @@ namespace pe
 			}
 		}
 
-		std::vector<phys_object*>* vec_ptr = nullptr;
-		phys_object* phys_ptr = (phys_object*)(object_ptr);
-
-		switch (phys_ptr->get_mov_type())
-		{
-		case movement_type::fixed:
-			vec_ptr = &(layers[phys_ptr->get_layer()].fixed_objects);
-			break;
-		case movement_type::movable:
-			vec_ptr = &(layers[phys_ptr->get_layer()].moving_objects);
-			break;
-		case movement_type::forcing:
-			vec_ptr = &(layers[phys_ptr->get_layer()].forcing_objects);
-			break;
-		default:
-			return;
-			break;
-		}
+		std::vector<phys_object*>* vec_ptr = &(layers[((phys_object*)(object_ptr))->get_layer()]);
 
 		for (unsigned long long i = 0; i < vec_ptr->size(); i++)
 		{
-			if (phys_ptr == (*vec_ptr)[i])
+			if (object_ptr == (*vec_ptr)[i])
 			{
 				vec_ptr->erase(vec_ptr->begin() + i);
 				object_ptr->owner = nullptr;
@@ -170,6 +165,11 @@ namespace pe
 	const std::vector<object*>& engine::get_objects() const
 	{
 		return objects;
+	}
+
+	const std::map<unsigned long long, std::vector<phys_object*>>& engine::get_layers() const
+	{
+		return layers;
 	}
 
 	object::object()
@@ -249,14 +249,19 @@ namespace pe
 		name = "phys_object";
 	}
 
-	movement_type phys_object::get_mov_type() const
-	{
-		return mov_type;
-	}
-
 	unsigned long long phys_object::get_layer() const
 	{
-		return 0;
+		return layer;
 	}
+
+	void phys_object::set_layer(unsigned long long new_layer)
+	{
+		engine* owner_ptr = get_owner();
+		owner_ptr->detach_object(this);
+		layer = new_layer;
+		phys_object* temp = this;
+		owner_ptr->add_phys_object(&temp);
+	}
+
 
 }

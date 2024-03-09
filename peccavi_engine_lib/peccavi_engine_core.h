@@ -100,16 +100,6 @@ namespace pe
 	};
 
 	/// <summary>
-	/// Movement type of a phys_object.
-	/// </summary>
-	enum struct movement_type
-	{
-		fixed,		// Object cannot be moved
-		movable,	// Object moving freely
-		forcing		// Object moving freely, and its movement cannot be obstructed by other objects
-	};
-
-	/// <summary>
 	/// A physical object with mass, position, rotation and collisions.
 	/// Base class : "object"
 	/// </summary>
@@ -119,33 +109,23 @@ namespace pe
 		friend struct component;
 
 	public:
+		bool active = false;					// Should physics apply or not
 		double mass = 1.0;						// Mass, Kg
 		vec position = { 0.0,0.0,0.0 };			// Position in 3D space, m
 		//vec rotation = { 0.0,0.0,0.0 };
 		vec velocity = { 0.0,0.0,0.0 };			// Velocity, m/s
 		//std::vector<component*> collisions = {};	// All collision components
+		collisions::collision_skeleton* collision = nullptr;
 
 	critical:
 		unsigned long long layer = 0;
-		movement_type mov_type = movement_type::movable;
 
 	public:
 		phys_object();
 
-		movement_type get_mov_type() const;
-
-		void set_mov_type(movement_type new_type);
-
 		unsigned long long get_layer() const;
 
 		void set_layer(unsigned long long new_layer);
-	};
-
-	struct collision_layer
-	{
-		std::vector<phys_object*> fixed_objects = {};
-		std::vector<phys_object*> moving_objects = {};
-		std::vector<phys_object*> forcing_objects = {};
 	};
 
 	/// <summary>
@@ -160,12 +140,13 @@ namespace pe
 	public:
 		double tick_time = 0.01;						// Desired time between ticks, s
 		vec gravity = { 0.0,0.0,-9.8 };
+		std::function<void(std::vector<phys_object*>&, double)> physics_tick;
 
 	critical:
 		timer clock;									// Clock
 		std::vector<object*> objects = {};				// Simplest objects. No physics for these
 		//std::vector<phys_object*> phys_objects = {};	// Physic objects. Full physics for these
-		std::map<unsigned long long, collision_layer> layers = {};
+		std::map<unsigned long long, std::vector<phys_object*>> layers = {};
 
 
 	public:
@@ -226,6 +207,8 @@ namespace pe
 		/// </summary>
 		/// <returns>Array of owned simple objects</returns>
 		const std::vector<object*>& get_objects() const;
+
+		const std::map<unsigned long long, std::vector<phys_object*>>& get_layers() const;
 	};
 
 }
